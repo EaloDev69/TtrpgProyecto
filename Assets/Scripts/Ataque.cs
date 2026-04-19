@@ -7,6 +7,7 @@ public class Ataque : MonoBehaviour
     public float Exito;
     public float Unidades;
     public float Decenas;
+    public float SegundaPrueba;
     public float DañoFinal;
     public bool  esperandoTirada = false;
 
@@ -51,30 +52,33 @@ public class Ataque : MonoBehaviour
     private void Pifia()
     {
         Debug.Log("Pifia. Pierdes el turno.");
+
         if (GameManager.Instance != null)
             GameManager.Instance.IniciarTurnoEnemigo();
     }
 
     private void Daño()
     {
-        Decenas   = Random.Range(0, 9) * 10;
-        Unidades  = Random.Range(0, 9);
-        DañoFinal = Decenas + Unidades;
-        Debug.Log("Tirada de daño: " + DañoFinal);
+        Decenas      = Random.Range(0, 9) * 10;
+        Unidades     = Random.Range(0, 9);
+        SegundaPrueba = Decenas + Unidades;
+        Debug.Log("Segunda prueba de daño: " + SegundaPrueba);
 
-        if (DañoFinal >= 90)
+        if (SegundaPrueba >= 90)
         {
-            Debug.Log("Pifia crítica.");
+            Debug.Log("Pifia crítica. Pierdes el turno.");
             Pifia();
         }
-        else if (DañoFinal < 50)
+        else if (SegundaPrueba < 50)
         {
-            Debug.Log("Fallo.");
+            Debug.Log("Fallo en segunda prueba.");
             Pifia();
         }
         else
         {
-            Debug.Log("Ataque exitoso: " + DañoFinal);
+            DañoFinal = Random.Range(0, 11);
+            Debug.Log("Ataque exitoso. Daño causado: " + DañoFinal);
+
             if (Enemigo.Instance != null)
                 Enemigo.Instance.RecibirDaño(DañoFinal);
         }

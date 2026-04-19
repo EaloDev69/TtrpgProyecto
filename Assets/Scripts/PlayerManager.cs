@@ -19,18 +19,18 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    void Update()
-    {
-        if (salud <= 0)
-        {
-            Debug.Log("El jugador ha muerto.");
-            Destroy(gameObject);
-        }
-    }
+    void Update() { }
 
     public void RecibirDaño(float cantidad)
     {
         salud -= cantidad;
         Debug.Log("Jugador recibió " + cantidad + " de daño. Salud restante: " + salud);
+
+        if (salud <= 0)
+        {
+            salud = 0;
+            if (GameManager.Instance != null)
+                GameManager.Instance.EncuentroPerdido();
+        }
     }
 }

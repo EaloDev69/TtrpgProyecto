@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -7,8 +8,12 @@ public class GameManager : MonoBehaviour
     public float IniciativaPlayerIA;
     public float IniciativaPlayer;
 
-    public bool PlayerTurn    = false;
-    public bool PlayerIATurn  = false;
+    public bool PlayerTurn   = false;
+    public bool PlayerIATurn = false;
+    public bool EncuentroTerminado = false;
+
+    [Header("Configuracion")]
+    public string escenaSiguiente = "SiguienteEscena"; // Cambia por el nombre real de tu escena
 
     void Awake()
     {
@@ -49,6 +54,8 @@ public class GameManager : MonoBehaviour
 
     public void IniciarTurnoJugador()
     {
+        if (EncuentroTerminado) return;
+
         PlayerTurn   = true;
         PlayerIATurn = false;
         if (Ataque.Instance != null)
@@ -58,10 +65,37 @@ public class GameManager : MonoBehaviour
 
     public void IniciarTurnoEnemigo()
     {
+        if (EncuentroTerminado) return;
+
         PlayerTurn   = false;
         PlayerIATurn = true;
         Debug.Log("=== TURNO DEL ENEMIGO ===");
         if (Enemigo.Instance != null)
             Enemigo.Instance.DañoJugador();
+    }
+
+    public void EncuentroGanado()
+    {
+        if (EncuentroTerminado) return;
+        EncuentroTerminado = true;
+
+        PlayerTurn   = false;
+        PlayerIATurn = false;
+
+        Debug.Log("=== VICTORIA: El jugador ha ganado el encuentro ===");
+        SceneManager.LoadScene(escenaSiguiente);
+        //escenaSiguiente es un placeholder, cámbialo por el nombre real de tu escena de victoria o siguiente nivel
+    }
+
+    public void EncuentroPerdido()
+    {
+        if (EncuentroTerminado) return;
+        EncuentroTerminado = true;
+
+        PlayerTurn   = false;
+        PlayerIATurn = false;
+
+        Debug.Log("=== DERROTA: El jugador ha perdido el encuentro ===");
+        Debug.Break(); // Pausa el editor; en build usa: Time.timeScale = 0f;
     }
 }
