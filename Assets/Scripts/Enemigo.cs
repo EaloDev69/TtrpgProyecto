@@ -4,9 +4,13 @@ public class Enemigo : MonoBehaviour
 {
     public static Enemigo Instance { get; private set; }
 
-    private float Salud  = 100f;
-    public  float DadoAC = 0f;
-    public  float Daño   = 0f;
+    private float Salud = 100f;
+
+    public float ExitoIA;
+    public float DecenasIA;
+    public float UnidadesIA;
+    public float SegundaPruebaIA;
+    public float DañoFinalIA;
 
     void Awake()
     {
@@ -21,47 +25,71 @@ public class Enemigo : MonoBehaviour
         }
     }
 
-    void Update()
-    {
-        if (Salud <= 0)
-        {
-            Debug.Log("El enemigo ha muerto.");
-            Destroy(gameObject);
-        }
-    }
+    void Update() { }
 
     public void RecibirDaño(float cantidad)
     {
         Salud -= cantidad;
         Debug.Log("Enemigo recibió " + cantidad + " de daño. Salud restante: " + Salud);
-        if (GameManager.Instance != null)
-            GameManager.Instance.IniciarTurnoEnemigo();
-    }
 
-    public void DañoJugador()
-    {
-        DadoAC = Random.Range(0, 20);
-
-        if (DadoAC >= 14)
+        if (Salud <= 0)
         {
-            Debug.Log("Enemigo acierta. Dado: " + DadoAC);
-            DadoDaño();
+            Salud = 0;
+            if (GameManager.Instance != null)
+                GameManager.Instance.EncuentroGanado();
         }
         else
         {
-            Debug.Log("Enemigo falló su ataque. Dado: " + DadoAC);
             if (GameManager.Instance != null)
                 GameManager.Instance.IniciarTurnoJugador();
         }
     }
 
-    private void DadoDaño()
+    public void DañoJugador()
     {
-        Daño = Random.Range(1, 11);
-        Debug.Log("Enemigo hace " + Daño + " de daño al jugador.");
-        if (PlayerManager.Instance != null)
-            PlayerManager.Instance.RecibirDaño(Daño);
+        ExitoIA = Random.Range(0, 9);
+        Debug.Log("[Enemigo] Tirada de prueba: " + ExitoIA);
+
+        if (ExitoIA <= 3)
+            PifiaIA();
+        else
+            DadoDañoIA();
+    }
+
+    private void PifiaIA()
+    {
+        Debug.Log("[Enemigo] Pifia. Cede el turno al jugador.");
         if (GameManager.Instance != null)
             GameManager.Instance.IniciarTurnoJugador();
+    }
+
+    private void DadoDañoIA()
+    {
+        DecenasIA       = Random.Range(0, 9) * 10;
+        UnidadesIA      = Random.Range(0, 9);
+        SegundaPruebaIA = DecenasIA + UnidadesIA;
+        Debug.Log("[Enemigo] Segunda prueba de daño: " + SegundaPruebaIA);
+
+        if (SegundaPruebaIA >= 90)
+        {
+            Debug.Log("[Enemigo] Pifia crítica. Cede el turno al jugador.");
+            PifiaIA();
+        }
+        else if (SegundaPruebaIA < 50)
+        {
+            Debug.Log("[Enemigo] Fallo en segunda prueba.");
+            PifiaIA();
+        }
+        else
+        {
+            DañoFinalIA = Random.Range(0, 11);
+            Debug.Log("[Enemigo] Ataque exitoso. Daño causado: " + DañoFinalIA);
+
+            if (PlayerManager.Instance != null)
+                PlayerManager.Instance.RecibirDaño(DañoFinalIA);
+
+            if (GameManager.Instance != null && !GameManager.Instance.EncuentroTerminado)
+                GameManager.Instance.IniciarTurnoJugador();
+        }
     }
 }
