@@ -2,55 +2,37 @@ using UnityEngine;
 
 public class Enemigo : MonoBehaviour
 {
-    public static Enemigo Instance { get; private set; }
-
-    private float Salud = 100f;
-
-    public float ExitoIA;
-    public float DecenasIA;
-    public float UnidadesIA;
-    public float SegundaPruebaIA;
-    public float DañoFinalIA;
-
-    void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
-
-    void Update() { }
-
+    public string nombreEnemigo = "Enemigo";
+    public float  salud         = 100f;
+    public bool   vivo          = true;
+    public bool   yaActuo       = false;
+    
     public void RecibirDaño(float cantidad)
     {
-        Salud -= cantidad;
-        Debug.Log("Enemigo recibió " + cantidad + " de daño. Salud restante: " + Salud);
+        if (!vivo) return;
 
-        if (Salud <= 0)
+        salud = Mathf.Max(0f, salud - cantidad);
+        Debug.Log(nombreEnemigo + " recibió " + cantidad + " de daño. Salud: " + salud);
+
+        if (salud <= 0f)
         {
-            Salud = 0;
+            vivo    = false;
+            yaActuo = true;
+            Debug.Log(nombreEnemigo + " ha muerto.");
+
+            // Si este era el enemigo seleccionado, GameManager auto-selecciona el siguiente
             if (GameManager.Instance != null)
-                GameManager.Instance.EncuentroGanado();
-        }
-        else
-        {
-            if (GameManager.Instance != null)
-                GameManager.Instance.IniciarTurnoJugador();
+                GameManager.Instance.ComprobarVictoria();
         }
     }
+    
 
-    public void DañoJugador()
+    public void EjecutarTurno()
     {
-        ExitoIA = Random.Range(0, 9);
-        Debug.Log("[Enemigo] Tirada de prueba: " + ExitoIA);
+        float exito = Random.Range(0, 10);
+        Debug.Log("[" + nombreEnemigo + "] Tirada de prueba: " + exito);
 
-        if (ExitoIA <= 3)
+        if (exito <= 3)
             PifiaIA();
         else
             DadoDañoIA();
@@ -58,38 +40,37 @@ public class Enemigo : MonoBehaviour
 
     private void PifiaIA()
     {
-        Debug.Log("[Enemigo] Pifia. Cede el turno al jugador.");
-        if (GameManager.Instance != null)
-            GameManager.Instance.IniciarTurnoJugador();
+        Debug.Log("[" + nombreEnemigo + "] Pifia. Cede el turno.");
+        yaActuo = true;
     }
 
     private void DadoDañoIA()
     {
-        DecenasIA       = Random.Range(0, 9) * 10;
-        UnidadesIA      = Random.Range(0, 9);
-        SegundaPruebaIA = DecenasIA + UnidadesIA;
-        Debug.Log("[Enemigo] Segunda prueba de daño: " + SegundaPruebaIA);
+        float decenas       = Random.Range(0, 10) * 10;
+        float unidades      = Random.Range(0, 10);
+        float segundaPrueba = decenas + unidades;
 
-        if (SegundaPruebaIA >= 90)
+        Debug.Log("[" + nombreEnemigo + "] Tirada percentil: " + segundaPrueba);
+
+        if (segundaPrueba >= 90 || segundaPrueba < 50)
         {
-            Debug.Log("[Enemigo] Pifia crítica. Cede el turno al jugador.");
             PifiaIA();
+            return;
         }
-        else if (SegundaPruebaIA < 50)
-        {
-            Debug.Log("[Enemigo] Fallo en segunda prueba.");
-            PifiaIA();
-        }
-        else
-        {
-            DañoFinalIA = Random.Range(0, 11);
-            Debug.Log("[Enemigo] Ataque exitoso. Daño causado: " + DañoFinalIA);
 
-            if (PlayerManager.Instance != null)
-                PlayerManager.Instance.RecibirDaño(DañoFinalIA);
+        float dañoFinal = Random.Range(0, 11);
 
-            if (GameManager.Instance != null && !GameManager.Instance.EncuentroTerminado)
-                GameManager.Instance.IniciarTurnoJugador();
+        PartyMember objetivo = GameManager.Instance != null
+            ? GameManager.Instance.ObtenerMiembroVivoAleatorio()
+            : null;
+
+        if (objetivo != null)
+        {
+            Debug.Log("[" + nombreEnemigo + "] Ataca a " +
+                      objetivo.nombrePersonaje + ". Daño: " + dañoFinal);
+            objetivo.RecibirDaño(dañoFinal);
         }
+
+        yaActuo = true;
     }
 }

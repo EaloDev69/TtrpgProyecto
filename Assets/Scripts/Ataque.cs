@@ -2,85 +2,78 @@ using UnityEngine;
 
 public class Ataque : MonoBehaviour
 {
-    public static Ataque Instance { get; private set; }
-
-    public float Exito;
-    public float Unidades;
-    public float Decenas;
-    public float SegundaPrueba;
-    public float DañoFinal;
-    public bool  esperandoTirada = false;
-
-    void Awake()
-    {
-        if (Instance == null)
-            Instance = this;
-        else
-            Destroy(gameObject);
-    }
-
     public void BotonAtacar()
     {
         if (GameManager.Instance == null)
         {
-            Debug.Log("ERROR: GameManager.Instance es null");
+            Debug.LogError("Ataque: no se encontró GameManager.");
+            return;
+        }
+        if (!GameManager.Instance.PlayerTurn)        { Debug.Log("Ataque: no es el turno del jugador."); return; }
+        if (GameManager.Instance.EncuentroTerminado) { Debug.Log("Ataque: el encuentro ya terminó.");    return; }
+
+        PartyMember atacante = GameManager.Instance.ObtenerMiembroActual();
+        if (atacante == null || !atacante.vivo) { Debug.Log("Ataque: no hay atacante válido."); return; }
+        if (atacante.yaActuo)                   { Debug.Log(atacante.nombrePersonaje + " ya actuó este turno."); return; }
+
+        Enemigo objetivo = GameManager.Instance.enemigoSeleccionado;
+        if (objetivo == null)  { Debug.Log("Ataque: no hay enemigo seleccionado."); return; }
+        if (!objetivo.vivo)    { Debug.Log("Ataque: ese enemigo ya está muerto."); return; }
+
+        PruebaDado(atacante, objetivo);
+    }
+
+    public void BotonSiguiente()
+    {
+        if (GameManager.Instance == null)            return;
+        if (!GameManager.Instance.PlayerTurn)        { Debug.Log("Siguiente: no es turno del jugador."); return; }
+        if (GameManager.Instance.EncuentroTerminado) return;
+
+        PartyMember actual = GameManager.Instance.ObtenerMiembroActual();
+        if (actual == null || !actual.yaActuo)       { Debug.Log("Siguiente: el miembro actual aún no ha actuado."); return; }
+
+        GameManager.Instance.AvanzarMiembroActual();
+    }
+
+    private void PruebaDado(PartyMember atacante, Enemigo objetivo)
+    {
+        float exito = Random.Range(0, 10);
+        Debug.Log("[" + atacante.nombrePersonaje + "] Tirada de prueba: " + exito);
+
+        if (exito <= 3) Pifia(atacante);
+        else            Daño(atacante, objetivo);
+    }
+
+    private void Pifia(PartyMember atacante)
+    {
+        Debug.Log("[" + atacante.nombrePersonaje + "] Pifia.");
+        TerminarAccion(atacante);
+    }
+
+    private void Daño(PartyMember atacante, Enemigo objetivo)
+    {
+        float decenas       = Random.Range(0, 10) * 10;
+        float unidades      = Random.Range(0, 10);
+        float segundaPrueba = decenas + unidades;
+        Debug.Log("[" + atacante.nombrePersonaje + "] Tirada percentil: " + segundaPrueba);
+
+        if (segundaPrueba >= 90 || segundaPrueba < 50)
+        {
+            Debug.Log("[" + atacante.nombrePersonaje + "] Fallo en segunda prueba.");
+            Pifia(atacante);
             return;
         }
 
-        if (GameManager.Instance.PlayerTurn && !esperandoTirada)
-        {
-            esperandoTirada = true;
-            PruebaDado();
-        }
-        else
-        {
-            Debug.Log("No es tu turno o ya tiraste el dado.");
-        }
+        float dañoFinal = Random.Range(0, 11);
+        Debug.Log("[" + atacante.nombrePersonaje + "] ataca a " +
+                  objetivo.nombreEnemigo + ". Daño: " + dañoFinal);
+        objetivo.RecibirDaño(dañoFinal);
+        TerminarAccion(atacante);
     }
 
-    private void PruebaDado()
+    private void TerminarAccion(PartyMember atacante)
     {
-        Exito = Random.Range(0, 9);
-        Debug.Log("Tirada de prueba: " + Exito);
-
-        if (Exito <= 3)
-            Pifia();
-        else
-            Daño();
-    }
-
-    private void Pifia()
-    {
-        Debug.Log("Pifia. Pierdes el turno.");
-
-        if (GameManager.Instance != null)
-            GameManager.Instance.IniciarTurnoEnemigo();
-    }
-
-    private void Daño()
-    {
-        Decenas      = Random.Range(0, 9) * 10;
-        Unidades     = Random.Range(0, 9);
-        SegundaPrueba = Decenas + Unidades;
-        Debug.Log("Segunda prueba de daño: " + SegundaPrueba);
-
-        if (SegundaPrueba >= 90)
-        {
-            Debug.Log("Pifia crítica. Pierdes el turno.");
-            Pifia();
-        }
-        else if (SegundaPrueba < 50)
-        {
-            Debug.Log("Fallo en segunda prueba.");
-            Pifia();
-        }
-        else
-        {
-            DañoFinal = Random.Range(0, 11);
-            Debug.Log("Ataque exitoso. Daño causado: " + DañoFinal);
-
-            if (Enemigo.Instance != null)
-                Enemigo.Instance.RecibirDaño(DañoFinal);
-        }
+        atacante.yaActuo = true;
+        Debug.Log("[" + atacante.nombrePersonaje + "] acción terminada. Pulsa Siguiente para continuar.");
     }
 }
