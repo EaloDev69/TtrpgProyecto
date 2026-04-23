@@ -29,8 +29,8 @@ public class PlayerManager : MonoBehaviour
         if (salud <= 0)
         {
             salud = 0;
-            if (GameManager.Instance != null)
-                GameManager.Instance.EncuentroPerdido();
+            if (BattleManager.Instance != null)
+                BattleManager.Instance.EncuentroPerdido();
         }
     }
 }

@@ -13,17 +13,17 @@ public class TurnoUI : MonoBehaviour
 
     private void ActualizarEtiqueta()
     {
-        if (etiquetaTurno == null || GameManager.Instance == null) return;
+        if (etiquetaTurno == null || BattleManager.Instance == null) return;
 
-        if (GameManager.Instance.EncuentroTerminado)
+        if (BattleManager.Instance.EncuentroTerminado)
         {
             etiquetaTurno.text = "";
             return;
         }
 
-        if (GameManager.Instance.PlayerTurn)
+        if (BattleManager.Instance.PlayerTurn)
         {
-            PartyMember actual = GameManager.Instance.ObtenerMiembroActual();
+            PartyMember actual = BattleManager.Instance.ObtenerMiembroActual();
 
             if (actual != null)
                 etiquetaTurno.text = "Turno de: " + actual.nombrePersonaje;

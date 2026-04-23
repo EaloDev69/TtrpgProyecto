@@ -381,7 +381,7 @@ MonoBehaviour:
   checkPiso: {fileID: 906529326}
   layerPiso:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 0
 --- !u!50 &804282526
 Rigidbody2D:
   serializedVersion: 4

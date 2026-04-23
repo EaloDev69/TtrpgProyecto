@@ -14,6 +14,6 @@ public class SelectorEnemigo : MonoBehaviour
 
     public void BotonCiclarEnemigo()
     {
-        GameManager.Instance.CiclarEnemigo();
+        BattleManager.Instance.CiclarEnemigo();
     }
 }
