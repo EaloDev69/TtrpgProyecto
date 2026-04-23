@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01b51d16ca1947d4bad91977de05d574, type: 3}
   m_Name: Player 3
   m_EditorClassIdentifier: 
-  nombrePersonaje: Personaje
+  nombrePersonaje: Player(3)
   saludMaxima: 100
   ataques:
   - nombreAtaque: Ataque

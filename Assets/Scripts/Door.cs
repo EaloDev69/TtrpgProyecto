@@ -49,7 +49,7 @@ public class Door : MonoBehaviour
 
     void Update()
     {
-        if (isPlayerInRange && Input.GetKeyDown(KeyCode.E))
+        if (isPlayerInRange)
         {
             SceneManager.LoadScene(sceneName);
         }
