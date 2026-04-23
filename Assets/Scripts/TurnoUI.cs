@@ -32,7 +32,7 @@ public class TurnoUI : MonoBehaviour
         }
         else
         {
-            etiquetaTurno.text = "Turno de los enemigos...";
+            etiquetaTurno.text = "Turno de los enemigos";
         }
     }
 }

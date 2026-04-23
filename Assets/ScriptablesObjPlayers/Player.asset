@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01b51d16ca1947d4bad91977de05d574, type: 3}
   m_Name: Player
   m_EditorClassIdentifier: 
-  nombrePersonaje: Personaje
+  nombrePersonaje: Player
   saludMaxima: 100
   ataques:
-  - nombreAtaque: Ataque
+  - nombreAtaque: cuchillo
     "da\xF1oMin": 1
     "da\xF1oMax": 6
-    descripcion: 
+    descripcion: (1-6)
