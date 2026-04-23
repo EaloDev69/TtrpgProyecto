@@ -2,9 +2,9 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameManager : MonoBehaviour
+public class BattleManager : MonoBehaviour
 {
-    public static GameManager Instance { get; private set; }
+    public static BattleManager Instance { get; private set; }
 
     public float IniciativaParty;
     public float IniciativaEnemigos;
@@ -98,6 +98,10 @@ public class GameManager : MonoBehaviour
         PlayerTurn = true;
         ResetearTurnoParty();
         Debug.Log("=== TURNO DEL JUGADOR ===");
+        
+        if (BotonesAtaqueUI.Instance != null)
+            BotonesAtaqueUI.Instance.RefrescarBotones();
+        
     }
 
     public PartyMember ObtenerMiembroActual()
@@ -129,6 +133,8 @@ public class GameManager : MonoBehaviour
             string objetivo = enemigoSeleccionado != null ? enemigoSeleccionado.nombreEnemigo : "ninguno";
             Debug.Log("Turno de: " + party[_indiceTurnoParty].nombrePersonaje +
                       " | Objetivo actual: " + objetivo);
+            if (BotonesAtaqueUI.Instance != null)
+                BotonesAtaqueUI.Instance.RefrescarBotones();
         }
     }
 

@@ -1,79 +1,116 @@
 using UnityEngine;
 
+/// <summary>
+/// Adjunta este script a los botones de ataque de tu UI.
+/// Cada botón llama a BotonAtacar(indice) con el índice del ataque (0, 1 o 2).
+/// </summary>
 public class Ataque : MonoBehaviour
 {
-    public void BotonAtacar()
+    // ─── Botones de ataque ────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Llama este método desde el botón de UI con el índice del ataque.
+    /// 0 = primer ataque, 1 = segundo, 2 = tercero.
+    /// Ejemplo en el Inspector del Button: BotonAtacar(0)
+    /// </summary>
+    public void BotonAtacar(int indiceAtaque)
     {
-        if (GameManager.Instance == null)
+        if (!ValidarEstadoCombate()) return;
+
+        PartyMember atacante = BattleManager.Instance.ObtenerMiembroActual();
+        if (!ValidarAtacante(atacante))  return;
+
+        // Comprueba que el personaje tenga ese índice de ataque
+        if (atacante.datos == null || indiceAtaque >= atacante.datos.ataques.Length)
         {
-            Debug.LogError("Ataque: no se encontró GameManager.");
+            Debug.Log($"Ataque: {atacante.nombrePersonaje} no tiene un ataque en el índice {indiceAtaque}.");
             return;
         }
-        if (!GameManager.Instance.PlayerTurn)        { Debug.Log("Ataque: no es el turno del jugador."); return; }
-        if (GameManager.Instance.EncuentroTerminado) { Debug.Log("Ataque: el encuentro ya terminó.");    return; }
 
-        PartyMember atacante = GameManager.Instance.ObtenerMiembroActual();
-        if (atacante == null || !atacante.vivo) { Debug.Log("Ataque: no hay atacante válido."); return; }
-        if (atacante.yaActuo)                   { Debug.Log(atacante.nombrePersonaje + " ya actuó este turno."); return; }
+        Enemigo objetivo = BattleManager.Instance.enemigoSeleccionado;
+        if (!ValidarObjetivo(objetivo)) return;
 
-        Enemigo objetivo = GameManager.Instance.enemigoSeleccionado;
-        if (objetivo == null)  { Debug.Log("Ataque: no hay enemigo seleccionado."); return; }
-        if (!objetivo.vivo)    { Debug.Log("Ataque: ese enemigo ya está muerto."); return; }
+        // EjecutarAtaque devuelve true si conectó, false si fue pifia
+        bool conecto = atacante.EjecutarAtaque(indiceAtaque, objetivo);
+        string resultado = conecto ? "conectó" : "falló (pifia)";
+        Debug.Log($"[{atacante.nombrePersonaje}] {atacante.datos.ataques[indiceAtaque].nombreAtaque} {resultado}.");
 
-        PruebaDado(atacante, objetivo);
+        TerminarAccion(atacante);
     }
+
+    // ─── Botón siguiente ──────────────────────────────────────────────────────
 
     public void BotonSiguiente()
     {
-        if (GameManager.Instance == null)            return;
-        if (!GameManager.Instance.PlayerTurn)        { Debug.Log("Siguiente: no es turno del jugador."); return; }
-        if (GameManager.Instance.EncuentroTerminado) return;
+        if (BattleManager.Instance == null)            return;
+        if (!BattleManager.Instance.PlayerTurn)        { Debug.Log("Siguiente: no es turno del jugador."); return; }
+        if (BattleManager.Instance.EncuentroTerminado) return;
 
-        PartyMember actual = GameManager.Instance.ObtenerMiembroActual();
-        if (actual == null || !actual.yaActuo)       { Debug.Log("Siguiente: el miembro actual aún no ha actuado."); return; }
-
-        GameManager.Instance.AvanzarMiembroActual();
-    }
-
-    private void PruebaDado(PartyMember atacante, Enemigo objetivo)
-    {
-        float exito = Random.Range(0, 10);
-        Debug.Log("[" + atacante.nombrePersonaje + "] Tirada de prueba: " + exito);
-
-        if (exito <= 3) Pifia(atacante);
-        else            Daño(atacante, objetivo);
-    }
-
-    private void Pifia(PartyMember atacante)
-    {
-        Debug.Log("[" + atacante.nombrePersonaje + "] Pifia.");
-        TerminarAccion(atacante);
-    }
-
-    private void Daño(PartyMember atacante, Enemigo objetivo)
-    {
-        float decenas       = Random.Range(0, 10) * 10;
-        float unidades      = Random.Range(0, 10);
-        float segundaPrueba = decenas + unidades;
-        Debug.Log("[" + atacante.nombrePersonaje + "] Tirada percentil: " + segundaPrueba);
-
-        if (segundaPrueba >= 90 || segundaPrueba < 50)
+        PartyMember actual = BattleManager.Instance.ObtenerMiembroActual();
+        if (actual == null || !actual.yaActuo)
         {
-            Debug.Log("[" + atacante.nombrePersonaje + "] Fallo en segunda prueba.");
-            Pifia(atacante);
+            Debug.Log("Siguiente: el miembro actual aún no ha actuado.");
             return;
         }
 
-        float dañoFinal = Random.Range(0, 11);
-        Debug.Log("[" + atacante.nombrePersonaje + "] ataca a " +
-                  objetivo.nombreEnemigo + ". Daño: " + dañoFinal);
-        objetivo.RecibirDaño(dañoFinal);
-        TerminarAccion(atacante);
+        BattleManager.Instance.AvanzarMiembroActual();
     }
+
+    // ─── Helpers ──────────────────────────────────────────────────────────────
 
     private void TerminarAccion(PartyMember atacante)
     {
         atacante.yaActuo = true;
-        Debug.Log("[" + atacante.nombrePersonaje + "] acción terminada. Pulsa Siguiente para continuar.");
+        Debug.Log($"[{atacante.nombrePersonaje}] acción terminada. Pulsa Siguiente para continuar.");
+    }
+
+    private bool ValidarEstadoCombate()
+    {
+        if (BattleManager.Instance == null)
+        {
+            Debug.LogError("Ataque: no se encontró GameManager.");
+            return false;
+        }
+        if (!BattleManager.Instance.PlayerTurn)
+        {
+            Debug.Log("Ataque: no es el turno del jugador.");
+            return false;
+        }
+        if (BattleManager.Instance.EncuentroTerminado)
+        {
+            Debug.Log("Ataque: el encuentro ya terminó.");
+            return false;
+        }
+        return true;
+    }
+
+    private bool ValidarAtacante(PartyMember atacante)
+    {
+        if (atacante == null || !atacante.vivo)
+        {
+            Debug.Log("Ataque: no hay atacante válido.");
+            return false;
+        }
+        if (atacante.yaActuo)
+        {
+            Debug.Log($"{atacante.nombrePersonaje} ya actuó este turno.");
+            return false;
+        }
+        return true;
+    }
+
+    private bool ValidarObjetivo(Enemigo objetivo)
+    {
+        if (objetivo == null)
+        {
+            Debug.Log("Ataque: no hay enemigo seleccionado.");
+            return false;
+        }
+        if (!objetivo.vivo)
+        {
+            Debug.Log("Ataque: ese enemigo ya está muerto.");
+            return false;
+        }
+        return true;
     }
 }

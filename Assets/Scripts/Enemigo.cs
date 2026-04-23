@@ -21,8 +21,8 @@ public class Enemigo : MonoBehaviour
             Debug.Log(nombreEnemigo + " ha muerto.");
 
             // Si este era el enemigo seleccionado, GameManager auto-selecciona el siguiente
-            if (GameManager.Instance != null)
-                GameManager.Instance.ComprobarVictoria();
+            if (BattleManager.Instance != null)
+                BattleManager.Instance.ComprobarVictoria();
         }
     }
     
@@ -60,8 +60,8 @@ public class Enemigo : MonoBehaviour
 
         float dañoFinal = Random.Range(0, 11);
 
-        PartyMember objetivo = GameManager.Instance != null
-            ? GameManager.Instance.ObtenerMiembroVivoAleatorio()
+        PartyMember objetivo = BattleManager.Instance != null
+            ? BattleManager.Instance.ObtenerMiembroVivoAleatorio()
             : null;
 
         if (objetivo != null)
