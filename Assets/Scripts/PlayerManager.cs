@@ -33,4 +33,5 @@ public class PlayerManager : MonoBehaviour
                 BattleManager.Instance.EncuentroPerdido();
         }
     }
+    //mmm
 }
