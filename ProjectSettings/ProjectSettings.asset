@@ -4,7 +4,7 @@
 PlayerSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 26
-  productGUID: a2187d6862bfc5d49af7029e8e4e92f8
+  productGUID: 722bbb2dbfbbc484e8ab88c7601b4c0e
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
   AndroidEnableSustainedPerformanceMode: 0
@@ -13,7 +13,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: DefaultCompany
-  productName: Parcial parte 2
+  productName: TtrpgProyecto
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -635,14 +635,14 @@ PlayerSettings:
   apiCompatibilityLevelPerPlatform: {}
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
-  metroPackageName: Parcial parte 2
+  metroPackageName: TtrpgProyecto
   metroPackageVersion: 
   metroCertificatePath: 
   metroCertificatePassword: 
   metroCertificateSubject: 
   metroCertificateIssuer: 
   metroCertificateNotAfter: 0000000000000000
-  metroApplicationDescription: Parcial parte 2
+  metroApplicationDescription: TtrpgProyecto
   wsaImages: {}
   metroTileShortName: 
   metroTileShowName: 0
@@ -709,13 +709,13 @@ PlayerSettings:
   hmiLogStartupTiming: 0
   hmiCpuConfiguration: 
   apiCompatibilityLevel: 6
-  activeInputHandler: 0
+  activeInputHandler: 2
   windowsGamepadBackendHint: 0
-  cloudProjectId: d88f2362-d839-4a8c-8d10-411dbb0345ea
+  cloudProjectId: 7eaae46e-266a-4458-b59b-a89153e53c90
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: Parcial parte 2
-  organizationId: ronny2007
+  projectName: TtrpgProyecto 2026-04-18_10-29-32
+  organizationId: ealo
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}
