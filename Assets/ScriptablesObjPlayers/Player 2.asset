@@ -13,17 +13,9 @@ MonoBehaviour:
   m_Name: Player 2
   m_EditorClassIdentifier: 
   nombrePersonaje: Player(2)
-  saludMaxima: 100
+  saludMaxima: 50
   ataques:
   - nombreAtaque: Ataque
-    "da\xF1oMin": 1
-    "da\xF1oMax": 6
-    descripcion: 
-  - nombreAtaque: Ataque
-    "da\xF1oMin": 1
-    "da\xF1oMax": 6
-    descripcion: 
-  - nombreAtaque: Ataque
-    "da\xF1oMin": 1
-    "da\xF1oMax": 6
+    "da\xF1oMin": 3
+    "da\xF1oMax": 16
     descripcion: 

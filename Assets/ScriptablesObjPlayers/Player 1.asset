@@ -13,13 +13,17 @@ MonoBehaviour:
   m_Name: Player 1
   m_EditorClassIdentifier: 
   nombrePersonaje: Player(1)
-  saludMaxima: 100
+  saludMaxima: 87
   ataques:
-  - nombreAtaque: Ataque
-    "da\xF1oMin": 1
-    "da\xF1oMax": 6
+  - nombreAtaque: 'golpe '
+    "da\xF1oMin": 4
+    "da\xF1oMax": 10
     descripcion: 
-  - nombreAtaque: Ataque
-    "da\xF1oMin": 1
-    "da\xF1oMax": 6
+  - nombreAtaque: golpe P
+    "da\xF1oMin": 4
+    "da\xF1oMax": 14
+    descripcion: 
+  - nombreAtaque: golpe P++
+    "da\xF1oMin": 4
+    "da\xF1oMax": 18
     descripcion: 

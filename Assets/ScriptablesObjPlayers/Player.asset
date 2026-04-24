@@ -13,9 +13,13 @@ MonoBehaviour:
   m_Name: Player
   m_EditorClassIdentifier: 
   nombrePersonaje: Player
-  saludMaxima: 100
+  saludMaxima: 68
   ataques:
-  - nombreAtaque: cuchillo
-    "da\xF1oMin": 1
-    "da\xF1oMax": 6
-    descripcion: (1-6)
+  - nombreAtaque: cuchillo1
+    "da\xF1oMin": 2
+    "da\xF1oMax": 14
+    descripcion: un cuchillo simple pero eficaz
+  - nombreAtaque: cuchillo2
+    "da\xF1oMin": 3
+    "da\xF1oMax": 12
+    descripcion: un cuchillo simple pero eficaz

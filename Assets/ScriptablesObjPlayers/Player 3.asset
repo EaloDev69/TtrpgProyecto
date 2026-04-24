@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Player 3
   m_EditorClassIdentifier: 
   nombrePersonaje: Player(3)
-  saludMaxima: 100
+  saludMaxima: 38
   ataques:
   - nombreAtaque: Ataque
-    "da\xF1oMin": 1
-    "da\xF1oMax": 6
+    "da\xF1oMin": 6
+    "da\xF1oMax": 14
     descripcion: 
