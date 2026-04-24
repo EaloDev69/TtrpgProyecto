@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 public class BattleManager : MonoBehaviour
 {
@@ -15,14 +16,15 @@ public class BattleManager : MonoBehaviour
     public string escenaSiguiente     = "SiguienteEscena";
     public float  esperaEntreEnemigos = 1.5f;
 
+    public EnemySpawner ensp;
+
     [Header("Party (arrastra aqui los PartyMember)")]
     public PartyMember[] party;
 
-    [Header("Enemigos")]
-    [SerializeField] private Enemigo[] enemigos;
+    // Cambiado de array a List para recibir enemigos dinámicamente del EnemySpawner
+    private List<Enemigo> enemigos = new List<Enemigo>();
 
     public Enemigo enemigoSeleccionado { get; private set; } = null;
-
     private int _indiceTurnoParty = 0;
 
     void Awake()
@@ -36,9 +38,12 @@ public class BattleManager : MonoBehaviour
     {
         if (party == null || party.Length == 0)
         {
-            Debug.LogError("GameManager: el array 'party' está vacío.");
+            Debug.LogError("BattleManager: el array 'party' está vacío.");
             return;
         }
+
+        // Primero se spawnean los enemigos, luego se inicia el turno
+        InitBattle();
 
         if (IniciativaEnemigos > IniciativaParty)
         {
@@ -52,9 +57,21 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    // EnemySpawner llama este método por cada enemigo que crea
+    public void RegistrarEnemigo(Enemigo enemigo)
+    {
+        if (enemigo != null && !enemigos.Contains(enemigo))
+            enemigos.Add(enemigo);
+    }
+
     public void SeleccionarEnemigo(Enemigo enemigo)
     {
         enemigoSeleccionado = enemigo;
+    }
+
+    public void InitBattle()
+    {
+        ensp.SpawnEnemigos();
     }
 
     private Enemigo ObtenerPrimerEnemigoVivo()
@@ -67,19 +84,11 @@ public class BattleManager : MonoBehaviour
     public void CiclarEnemigo()
     {
         if (!PlayerTurn || EncuentroTerminado) return;
-        if (enemigos == null || enemigos.Length == 0) return;
+        if (enemigos == null || enemigos.Count == 0) return;
 
-        int indiceActual = -1;
-        for (int i = 0; i < enemigos.Length; i++)
-        {
-            if (enemigos[i] == enemigoSeleccionado)
-            {
-                indiceActual = i;
-                break;
-            }
-        }
+        int indiceActual = enemigos.IndexOf(enemigoSeleccionado);
 
-        int total = enemigos.Length;
+        int total = enemigos.Count;
         for (int offset = 1; offset <= total; offset++)
         {
             int i = (indiceActual + offset) % total;
@@ -98,10 +107,9 @@ public class BattleManager : MonoBehaviour
         PlayerTurn = true;
         ResetearTurnoParty();
         Debug.Log("=== TURNO DEL JUGADOR ===");
-        
+
         if (BotonesAtaqueUI.Instance != null)
             BotonesAtaqueUI.Instance.RefrescarBotones();
-        
     }
 
     public PartyMember ObtenerMiembroActual()
@@ -115,7 +123,6 @@ public class BattleManager : MonoBehaviour
     public void AvanzarMiembroActual()
     {
         _indiceTurnoParty++;
-
         while (_indiceTurnoParty < party.Length &&
                (party[_indiceTurnoParty] == null || !party[_indiceTurnoParty].vivo))
             _indiceTurnoParty++;
@@ -133,6 +140,7 @@ public class BattleManager : MonoBehaviour
             string objetivo = enemigoSeleccionado != null ? enemigoSeleccionado.nombreEnemigo : "ninguno";
             Debug.Log("Turno de: " + party[_indiceTurnoParty].nombrePersonaje +
                       " | Objetivo actual: " + objetivo);
+
             if (BotonesAtaqueUI.Instance != null)
                 BotonesAtaqueUI.Instance.RefrescarBotones();
         }
@@ -141,7 +149,6 @@ public class BattleManager : MonoBehaviour
     private void ResetearTurnoParty()
     {
         _indiceTurnoParty = 0;
-
         while (_indiceTurnoParty < party.Length &&
                (party[_indiceTurnoParty] == null || !party[_indiceTurnoParty].vivo))
             _indiceTurnoParty++;
@@ -150,6 +157,7 @@ public class BattleManager : MonoBehaviour
             if (miembro != null) miembro.yaActuo = false;
 
         enemigoSeleccionado = ObtenerPrimerEnemigoVivo();
+
         if (enemigoSeleccionado != null)
             Debug.Log("Objetivo inicial: " + enemigoSeleccionado.nombreEnemigo);
 
@@ -185,7 +193,6 @@ public class BattleManager : MonoBehaviour
         foreach (Enemigo enemigo in enemigos)
         {
             if (EncuentroTerminado) yield break;
-
             if (enemigo == null || !enemigo.vivo)
             {
                 if (enemigo != null) enemigo.yaActuo = true;
@@ -205,7 +212,7 @@ public class BattleManager : MonoBehaviour
 
     public PartyMember ObtenerMiembroVivoAleatorio()
     {
-        var vivos = new System.Collections.Generic.List<PartyMember>();
+        var vivos = new List<PartyMember>();
         foreach (PartyMember m in party)
             if (m != null && m.vivo) vivos.Add(m);
 
